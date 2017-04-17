@@ -35,32 +35,27 @@ train = train.dropna(axis = 0, how = 'any')
 test = test[discrete_features + continuous_features]
 test = test.dropna(axis = 0, how = 'any')
 
+# TODO: impute missing values instead of removing NAs
+
+
+#%% GET DUMMIES
+# 'dropFirst=False', because multicollinearity okay for decision trees
+
+train = pd.get_dummies(train, drop_first=False)
+
 
 #%%
 
-x_train = train[discrete_features + continuous_features]
+x_train = train.drop('Survived', axis=1)
 y_train = train['Survived']
 
-x_test = test[discrete_features + continuous_features]
+x_test = test
 
 
-#%% LABEL ENCODER & IMPUTATION
-
-le_embarked = LabelEncoder()
-
-x_train['Embarked'] = le_embarked.fit_transform(x_train['Embarked'])
-x_test['Embarked'] = le_embarked.transform(x_test['Embarked'])
-
-le_sex = LabelEncoder()
-x_train['Sex'] = le_sex.fit_transform(x_train['Sex'])
-x_test['Sex'] = le_sex.transform(x_test['Sex'])
-
-
-#%% SIMPLE TRAIN (TODO: CROSS-VALIDATION)
+#%% EVALUATE MODEL ACCURACY
 
 model = RandomForestClassifier(random_state=0, verbose=0, n_estimators=1000)
 cross_val_score(model, x_train, y_train, cv=5, n_jobs=-1)
-
 
 
 #%%
